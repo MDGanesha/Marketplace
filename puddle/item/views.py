@@ -2,6 +2,7 @@ from django.shortcuts import render,get_object_or_404,redirect
 from .models import Item
 from django.contrib.auth.decorators import login_required
 from .forms import NewItemForm,EditItemForm
+from django.db.models import Q
 # Create your views here.
 def detail(request, pk):
     item = get_object_or_404(Item, pk = pk)
@@ -38,3 +39,11 @@ def edit(request,pk):
             return redirect('item:detail',pk=item.id)
     form = EditItemForm(instance=item)
     return render(request,'item/form.html',{'form':form})
+
+
+def items(request):
+    items = Item.objects.filter(is_sold = False)
+    query = request.GET.get('query')
+    if(query):
+        items = Item.objects.filter(Q(name__icontains = query) | Q(description__icontains=query))
+    return render(request,'item/items.html',{'items':items})
