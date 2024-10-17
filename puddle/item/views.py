@@ -1,6 +1,7 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import Item
 from django.contrib.auth.decorators import login_required
+from .models import Category
 from .forms import NewItemForm,EditItemForm
 from django.db.models import Q
 # Create your views here.
@@ -27,7 +28,7 @@ def new(request):
 def delete(request,pk):
     item = get_object_or_404(Item, pk = pk,created_by=request.user)
     item.delete()
-    return redirect('dashboard:index')
+    return redirect('core:index')
 
 @login_required
 def edit(request,pk):
@@ -42,8 +43,12 @@ def edit(request,pk):
 
 
 def items(request):
+    query = request.GET.get('query','')    
+    category_id = request.GET.get('category',0)
     items = Item.objects.filter(is_sold = False)
-    query = request.GET.get('query')
+    if(category_id):
+        items = items.filter(category__id=category_id)
+    categoies = Category.objects.all()
     if(query):
         items = Item.objects.filter(Q(name__icontains = query) | Q(description__icontains=query))
-    return render(request,'item/items.html',{'items':items})
+    return render(request,'item/items.html',{'items':items,'query':query,'categories':categoies,"category_id":int(category_id)})
