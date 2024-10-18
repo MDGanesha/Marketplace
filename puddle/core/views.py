@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from item.models import Category,Item
-from .forms import SignupForm
+from .forms import SignupForm,LoginForm
+from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 # Create your views here.
 def index(request):
@@ -9,6 +10,9 @@ def index(request):
     return render(request,'core/index.html',{'categories':categories,'items':items})
 def contact(request):
     return render(request,'core/contact.html')
+
+
+ 
 
 def signup(request):
     if request.method=='POST':
